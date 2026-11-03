@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Gaurav Sharma builds RAG systems and machine learning models in Python. Projects, internships and hackathons.">
+<meta property="og:title" content="Gaurav Sharma">
+<meta property="og:description" content="Gaurav Sharma builds RAG systems and machine learning models in Python. Projects, internships and hackathons.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tech54.github.io/">
+<meta property="og:image" content="https://tech54.github.io/assets/gaurav.jpg">
+<title>Gaurav Sharma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=DM+Mono:wght@400;500&family=Hanken+Grotesk:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: a black-and-white page where the only colour is a highlighter, used on what a search retrieved. */
+:root {
+  --paper: #e9eceb; --panel: #f5f7f6; --ink: #15191a; --muted: #535d60; --line: #c1c8c6;
+  --bar: #6d787b; --mark: #ffd60a; --mark-ink: #15191a; --photo: none;
+  --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --body: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+  --mono: "DM Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111516; --panel: #1a2022; --ink: #e8eceb; --muted: #9da8ab; --line: #2f3739;
+    --bar: #7f8b8e; --mark: #ffd60a; --mark-ink: #15191a; --photo: brightness(.86); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111516; --panel: #1a2022; --ink: #e8eceb; --muted: #9da8ab; --line: #2f3739;
+  --bar: #7f8b8e; --mark: #ffd60a; --mark-ink: #15191a; --photo: brightness(.86); color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition: none !important; } }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 1.0625rem/1.6 var(--body); }
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { background: var(--mark); color: var(--mark-ink); text-decoration: none; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+h1, h2, h3, p, ul, figure { margin: 0; }
+ul { padding: 0; list-style: none; }
+mark { background: var(--mark); color: var(--mark-ink); padding: 0 .12em; }
+
+.wrap {
+  max-width: 1280px; margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.label { font: 400 .78rem/1.4 var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 24px; padding-block: 18px 12px; font: 400 .85rem/1.5 var(--mono); }
+.top nav { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+
+h1 {
+  font: 900 min(10.5vw, 8.7rem)/.86 var(--display); text-transform: uppercase; white-space: nowrap;
+  letter-spacing: -.005em; padding-block: 6px 22px;
+}
+.hero { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(20px, 4vw, 56px); padding-bottom: clamp(40px, 6vw, 80px); align-items: start; }
+.portrait img { width: 100%; height: auto; aspect-ratio: 720 / 920; object-fit: cover; object-position: top; filter: var(--photo); }
+.intro { display: grid; gap: 28px; min-width: 0; }
+.lede { font: 700 clamp(2rem, 4.1vw, 3.5rem)/1.04 var(--display); text-wrap: balance; max-width: 20ch; }
+.status { max-width: 58ch; }
+.status strong { font-weight: 600; }
+
+.search { background: var(--panel); border: 2px solid var(--ink); padding: clamp(14px, 2vw, 22px); display: grid; gap: 14px; min-width: 0; }
+.search form { display: flex; gap: 8px; flex-wrap: wrap; }
+.search input {
+  flex: 1 1 220px; min-width: 0; font: 400 1rem/1.3 var(--mono); padding: 11px 12px;
+  background: var(--paper); color: var(--ink); border: 1px solid var(--muted); border-radius: 0;
+}
+button { font: 500 .85rem/1.2 var(--mono); color: var(--paper); background: var(--ink); border: 1px solid var(--ink); padding: 11px 14px; cursor: pointer; border-radius: 0; }
+button:hover { background: var(--mark); color: var(--mark-ink); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips button { background: transparent; color: var(--ink); border-color: var(--line); padding: 6px 9px; font-weight: 400; font-size: .8rem; }
+.chips button:hover { background: var(--mark); color: var(--mark-ink); border-color: var(--mark); }
+.results { display: grid; gap: 14px; min-width: 0; }
+.hit { display: grid; gap: 4px; min-width: 0; }
+.hit-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; font: 500 .85rem/1.4 var(--mono); }
+.hit-score { color: var(--muted); font-weight: 400; font-variant-numeric: tabular-nums; }
+.hit-bar { height: 3px; background: var(--line); }
+.hit-bar i { display: block; height: 100%; background: var(--ink); transition: width .25s ease; }
+.hit p { font-size: .97rem; line-height: 1.5; overflow-wrap: anywhere; }
+.note { font: 400 .78rem/1.5 var(--mono); color: var(--muted); max-width: 72ch; }
+
+section { border-top: 2px solid var(--ink); padding-block: 22px clamp(40px, 6vw, 72px); }
+h2 { font: 900 clamp(2.5rem, 6vw, 4.75rem)/.95 var(--display); text-transform: uppercase; padding-bottom: clamp(18px, 3vw, 36px); }
+
+.project { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px clamp(20px, 4vw, 56px); padding-block: 28px; border-top: 1px solid var(--line); scroll-margin-top: 12px; }
+.project:first-of-type { border-top: 0; padding-top: 0; }
+.project h3 { font: 700 clamp(1.8rem, 3vw, 2.6rem)/1.02 var(--display); text-wrap: balance; }
+.project-side { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.project-main { display: grid; gap: 16px; min-width: 0; }
+.project-main > p { max-width: 65ch; }
+.pipeline { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font: 400 .8rem/1.35 var(--mono); }
+.pipeline span { border: 1px solid var(--muted); padding: 4px 8px; }
+.pipeline b { font-weight: 400; color: var(--muted); }
+.stats { display: flex; flex-wrap: wrap; gap: 14px 32px; }
+.stat strong { display: block; font: 700 2.1rem/1 var(--display); font-variant-numeric: tabular-nums; }
+.bars { display: grid; gap: 7px; max-width: 560px; font: 400 .85rem/1.3 var(--mono); }
+.bars figcaption { color: var(--muted); }
+.bar { display: grid; grid-template-columns: 5.2em minmax(0, 1fr); align-items: center; gap: 8px; }
+.bar div { display: flex; align-items: center; gap: 8px; font-variant-numeric: tabular-nums; }
+.bar i { display: block; height: 16px; background: var(--bar); }
+.bar.top i { background: var(--mark); outline: 1px solid var(--ink); outline-offset: -1px; }
+.shot { display: grid; gap: 6px; }
+.shot img { width: 100%; height: auto; border: 1px solid var(--line); }
+.shot figcaption { font: 400 .78rem/1.4 var(--mono); color: var(--muted); }
+
+.gantt { display: grid; grid-template-columns: minmax(0, 5fr) repeat(5, minmax(0, 1.4fr)); row-gap: 6px; font: 400 .8rem/1.3 var(--mono); padding-bottom: 28px; }
+.gantt .m { color: var(--muted); border-left: 1px solid var(--line); padding-left: 5px; }
+.gantt .n { grid-column: 1; padding-right: 10px; align-self: center; }
+.gantt .b { height: 20px; background: var(--ink); align-self: center; }
+.jobs { display: grid; gap: 30px; }
+.job { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 10px clamp(20px, 4vw, 56px); }
+.job h3 { font: 700 1.65rem/1.08 var(--display); }
+.job ul, .list { display: grid; gap: 7px; }
+.job li { padding-left: 1em; text-indent: -1em; max-width: 65ch; }
+.job li::before { content: "– "; color: var(--muted); }
+
+.skills { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 26px 40px; }
+.skills-wide { grid-column: 1 / -1; }
+.skills h3, .col h3 { font: 700 1.4rem/1.1 var(--display); padding-bottom: 6px; }
+.cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px clamp(20px, 4vw, 56px); }
+.list li small { display: block; font: 400 .8rem/1.4 var(--mono); color: var(--muted); }
+
+.contact { display: grid; gap: 18px; }
+.email { font: 900 clamp(1.3rem, 5.2vw, 4.2rem)/1 var(--display); overflow-wrap: anywhere; user-select: all; }
+.contact-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; font: 400 .95rem/1.4 var(--mono); }
+footer { border-top: 1px solid var(--line); padding-block: 16px 28px; font: 400 .78rem/1.5 var(--mono); color: var(--muted); }
+
+@media (max-width: 800px) {
+  h1 { font-size: 22vw; }
+  h1 span { display: block; }
+  .hero, .project, .job, .cols { grid-template-columns: minmax(0, 1fr); }
+  .portrait img { aspect-ratio: 1 / 1; object-position: 50% 12%; }
+  .gantt { grid-template-columns: minmax(0, 1fr) repeat(5, 2.6em); font-size: .74rem; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span>Kotabagh, Uttarakhand, India</span>
+    <nav aria-label="Sections">
+      <a href="#projects">Projects</a>
+      <a href="#experience">Experience</a>
+      <a href="#skills">Skills</a>
+      <a href="#record">Hackathons</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <h1><span>Gaurav</span> <span>Sharma</span></h1>
+
+  <div class="hero">
+    <figure class="portrait">
+      <img src="assets/gaurav.jpg" width="720" height="920" alt="Gaurav Sharma in sunglasses, leaning back on a railing with hills behind him">
+    </figure>
+    <div class="intro">
+      <p class="lede">I build RAG systems and machine learning models in Python.</p>
+      <p class="status" data-chunk="About" data-link="#contact">B.Tech CSE (AI &amp; ML) student at Amrapali University, Haldwani. I completed three remote AI/ML internships in 2026. <strong>I am looking for AI/ML Engineer, Machine Learning Engineer, Generative AI and Data Science roles.</strong></p>
+
+      <div class="search">
+        <label class="label" for="q">Search this portfolio</label>
+        <form id="search-form">
+          <input id="q" type="search" autocomplete="off" value="RAG chatbot with human escalation">
+          <button type="submit">Retrieve</button>
+        </form>
+        <div class="chips" aria-label="Example searches">
+          <button type="button">offline private AI</button>
+          <button type="button">churn in Germany</button>
+          <button type="button">Flask and SQLite</button>
+          <button type="button">hackathons</button>
+          <button type="button">automated tests</button>
+        </div>
+        <div class="results" id="results" aria-live="polite"></div>
+        <p class="note">BM25 ranking over the text of this page, running in your browser. This is the keyword half of the hybrid search in my Private AI Vault. It returns passages from the page and uses no LLM or server.</p>
+      </div>
+    </div>
+  </div>
+
+  <section id="projects">
+    <h2>Projects</h2>
+
+    <article class="project" id="support-bot" data-chunk="Enterprise-Grade AI Support Bot">
+      <div class="project-side">
+        <h3>Enterprise-Grade AI Support Bot</h3>
+        <p class="label">Python, Flask, LangChain, ChromaDB, HuggingFace, Gemini, JavaScript</p>
+        <p><a href="https://github.com/Tech54/My-AI-Chatbot">Source on GitHub</a></p>
+      </div>
+      <div class="project-main">
+        <p>A customer support chatbot that uses retrieval-augmented generation (RAG) to ground its answers in a company knowledge base. A tool-calling agent decides whether to search the knowledge base or escalate the conversation to a human. It remembers the conversation, accepts voice input through the Web Speech API, and has an admin portal for chat logs and adding new knowledge without a restart.</p>
+        <div class="pipeline" aria-label="How a question flows through the system">
+          <span>Question</span><b>→</b><span>Gemini agent</span><b>→</b><span>search_knowledge_base (ChromaDB)</span><b>or</b><span>transfer_to_human</span><b>→</b><span>SQLite log</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="project" id="ai-vault" data-chunk="Enterprise Private AI Vault">
+      <div class="project-side">
+        <h3>Enterprise Private AI Vault</h3>
+        <p class="label">Streamlit, Ollama, Presidio, FAISS, BM25, SQLite</p>
+        <p><a href="https://github.com/Tech54/-Enterprise-Private-AI-Vault">Source on GitHub</a></p>
+      </div>
+      <div class="project-main">
+        <p>An offline document search system for sensitive files, built with Team Code Warriors. It runs Llama 3 locally through Ollama, so queries never reach a cloud API. Names, emails and phone numbers are redacted from every PDF, DOCX or TXT before storage. An audit view shows the redacted passages behind each answer.</p>
+        <div class="pipeline" aria-label="How a document flows through the system">
+          <span>Document</span><b>→</b><span>Presidio redaction</span><b>→</b><span>FAISS + BM25 search</span><b>→</b><span>Cross-encoder rerank</span><b>→</b><span>Llama 3 on Ollama</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="project" id="churn" data-chunk="Customer Segmentation and Churn Analytics">
+      <div class="project-side">
+        <h3>Customer Segmentation &amp; Churn Analytics</h3>
+        <p class="label">Python, Pandas, Seaborn, Jupyter, Streamlit</p>
+        <p><a href="https://github.com/Tech54/Customer-Segmentation---Churn-Pattern-Analytics-in-European-Banking">Source on GitHub</a></p>
+      </div>
+      <div class="project-main">
+        <p>Exploratory analysis of 10,000 European retail banking customers, with an interactive dashboard. I segmented customers to find high-risk groups and turned the findings into retention recommendations. Overall churn was 20.4%, and Germany was highest at 32.4%. Inactive members left at 26.9%, against 14.3% for active members.</p>
+        <figure class="bars">
+          <figcaption>Churn rate by country</figcaption>
+          <div class="bar top"><span>Germany</span><div><i style="width:70%"></i>32.4%</div></div>
+          <div class="bar"><span>Spain</span><div><i style="width:36%"></i>16.7%</div></div>
+          <div class="bar"><span>France</span><div><i style="width:34.9%"></i>16.2%</div></div>
+        </figure>
+      </div>
+    </article>
+
+    <article class="project" id="smart-hostel" data-chunk="Smart Hostel">
+      <div class="project-side">
+        <h3>Smart Hostel</h3>
+        <p class="label">Python, Tkinter, SQLite</p>
+        <p><a href="https://github.com/Tech54/smart-hostel">Source on GitHub</a></p>
+      </div>
+      <div class="project-main">
+        <p>A hostel management desktop app built for a Total Quality Management course, covering room allocation, fees and complaints. Invalid actions such as double-booking a bed are blocked and logged with an error code, and a quality dashboard turns those logs into KPIs and a Pareto chart. It has automated tests and needs no packages beyond the Python standard library.</p>
+        <div class="stats">
+          <div class="stat"><strong>49</strong><span class="label">automated tests</span></div>
+          <div class="stat"><strong>4</strong><span class="label">user roles</span></div>
+          <div class="stat"><strong>0</strong><span class="label">packages to install</span></div>
+        </div>
+        <figure class="shot">
+          <img src="assets/smart-hostel-quality-dashboard.webp" width="1240" height="760" loading="lazy" alt="Smart Hostel quality dashboard with KPI tiles, a Pareto chart of blocked actions and zero-defect checks">
+          <figcaption>Quality dashboard, running on the app's synthetic demo data</figcaption>
+        </figure>
+      </div>
+    </article>
+  </section>
+
+  <section id="experience">
+    <h2>Experience</h2>
+    <div class="gantt" role="img" aria-label="Timeline for 2026. Pratinik Infotech May to July, Unified Mentor June to September, Navodita Infotech June to July.">
+      <span class="label">2026</span>
+      <span class="m">May</span><span class="m">Jun</span><span class="m">Jul</span><span class="m">Aug</span><span class="m">Sep</span>
+      <span class="n">Pratinik Infotech</span><i class="b" style="grid-column:2 / 5"></i>
+      <span class="n">Unified Mentor</span><i class="b" style="grid-column:3 / 7"></i>
+      <span class="n">Navodita Infotech</span><i class="b" style="grid-column:3 / 5"></i>
+    </div>
+    <div class="jobs">
+      <article class="job" data-chunk="AI Intern, Pratinik Infotech" data-link="#experience">
+        <div><h3>Artificial Intelligence Intern</h3><p class="label">Pratinik Infotech, remote</p></div>
+        <ul>
+          <li>Built and deployed a RAG customer support chatbot that grounds its answers in retrieved knowledge-base content to reduce hallucinations.</li>
+          <li>Developed agentic routing with LangChain and Python that detects queries the bot cannot resolve and escalates them to live agents.</li>
+          <li>Built a vector database pipeline with ChromaDB and HuggingFace embeddings for semantic retrieval.</li>
+          <li>Developed a full-stack Flask app with an admin dashboard for SQLite chat logs and real-time analytics.</li>
+        </ul>
+      </article>
+      <article class="job" data-chunk="Machine Learning Intern, Unified Mentor" data-link="#experience">
+        <div><h3>Machine Learning Intern</h3><p class="label">Unified Mentor Private Limited, remote</p></div>
+        <ul>
+          <li>Developed and evaluated supervised machine learning models for predictive modeling with Python and Scikit-learn.</li>
+          <li>Cleaned and preprocessed datasets, handling missing values, categorical encoding and feature scaling.</li>
+          <li>Compared models using accuracy, precision, recall and F1-score to select the best performer.</li>
+        </ul>
+      </article>
+      <article class="job" data-chunk="Data Science Intern, Navodita Infotech" data-link="#experience">
+        <div><h3>Data Science Intern</h3><p class="label">Navodita Infotech, remote</p></div>
+        <ul>
+          <li>Completed data cleaning and exploratory data analysis (EDA) on real-world datasets.</li>
+          <li>Visualized trends and distributions with Python libraries to surface patterns.</li>
+          <li>Summarized findings into clear, data-driven recommendations.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section id="skills">
+    <h2>Skills</h2>
+    <div class="skills">
+      <div data-chunk="Skills: Generative AI and LLMs" data-link="#skills"><h3>Generative AI &amp; LLMs</h3><p>RAG, LangChain, LLM application development, prompt engineering, HuggingFace embeddings, semantic search, conversational AI, agentic workflows</p></div>
+      <div data-chunk="Skills: Machine learning and data science" data-link="#skills"><h3>Machine learning &amp; data science</h3><p>Scikit-learn, supervised learning, predictive modeling, feature engineering, model evaluation, EDA, data visualization, customer segmentation, churn analysis</p></div>
+      <div data-chunk="Skills: Databases and backend" data-link="#skills"><h3>Databases &amp; backend</h3><p>ChromaDB, SQLite, Oracle Database, Flask, REST APIs</p></div>
+      <div data-chunk="Skills: Languages and tools" data-link="#skills"><h3>Languages &amp; tools</h3><p>Python, JavaScript, SQL, Git, GitHub, GitHub Codespaces, HuggingFace</p></div>
+      <div class="skills-wide" data-chunk="Skills: Professional" data-link="#skills"><h3>Professional</h3><p>Team leadership, public speaking, problem solving, remote collaboration, technical documentation</p></div>
+    </div>
+  </section>
+
+  <section id="record">
+    <h2>Record</h2>
+    <div class="cols">
+      <div class="col" data-chunk="Hackathons" data-link="#record">
+        <h3>Hackathons</h3>
+        <ul class="list">
+          <li>Qualified for Round 2 (offline) of Eclipse 6.0 Hackathon<small>Thapar Institute (TIET), Patiala</small></li>
+          <li>Team Lead, Team Code Warriors, atomQUEST 2026<small>Atomberg Hackathon, water purifier innovation track</small></li>
+          <li>Participant, CodeNoir Hackathon 2026<small>Unstop</small></li>
+          <li>Participant, Prompt to Podium<small>Kreyato AI competition, Unstop, 2026</small></li>
+          <li>Participant, CodeStrike 2026<small>Official Coding Championship</small></li>
+        </ul>
+      </div>
+      <div class="col" data-chunk="Certifications" data-link="#record">
+        <h3>Certifications</h3>
+        <ul class="list">
+          <li>Machine Learning with AI<small>Internshala Trainings, Jun 2026</small></li>
+          <li>Generative AI Mastermind<small>Outskill, Mar 2026</small></li>
+          <li>Artificial Intelligence Internship Credential<small>Pratinik Infotech, Jul 2026</small></li>
+          <li>SEO Crash Course<small>Semrush, Apr 2026</small></li>
+        </ul>
+      </div>
+      <div class="col" data-chunk="Education" data-link="#record">
+        <h3>Education</h3>
+        <ul class="list">
+          <li>B.Tech, Computer Science &amp; Engineering (AI &amp; ML)<small>Amrapali University, Haldwani, 2024 to 2028 (expected)</small></li>
+          <li>Senior Secondary (Class XII), CBSE, Science<small>Mother's Glory Public School, Nainital, 2024</small></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <p class="label">Get in touch</p>
+    <a class="email" id="email" href="mailto:gauravsharma790645@gmail.com">gauravsharma790645@gmail.com</a>
+    <div class="contact-row">
+      <button type="button" id="copy-email">Copy email</button>
+      <a href="https://github.com/Tech54">GitHub: Tech54</a>
+      <a href="https://www.linkedin.com/in/gaurav-sharma-1a531a321">LinkedIn</a>
+    </div>
+  </section>
+
+  <footer>Gaurav Sharma. Plain HTML, CSS and JavaScript, last updated November 2026.</footer>
+</div>
+
+<script>
+(function () {
+  var STOP = new Set("a an and are as at be by can did do does for from had has have he his how i in is it me my of on or the this to was were what when where which who with you your".split(" "));
+  function stem(w) { w = w.toLowerCase(); return (w.length > 3 && /s$/.test(w) && !/ss$/.test(w)) ? w.slice(0, -1) : w; }
+  function terms(s) { return (s.match(/[A-Za-z0-9_]+/g) || []).map(stem).filter(function (t) { return !STOP.has(t); }); }
+
+  var docs = Array.prototype.map.call(document.querySelectorAll("[data-chunk]"), function (el) {
+    var clone = el.cloneNode(true);
+    Array.prototype.forEach.call(clone.querySelectorAll("small"), function (n) { n.prepend(", "); });
+    Array.prototype.forEach.call(clone.querySelectorAll("li, p, h3, figcaption, .bar, .stat"), function (n) { n.append(". "); });
+    var text = clone.textContent.replace(/\s+/g, " ").replace(/(\. )+\.? ?/g, ". ").trim();
+    var toks = terms(text), tf = {};
+    toks.forEach(function (t) { tf[t] = (tf[t] || 0) + 1; });
+    return { title: el.dataset.chunk, link: el.dataset.link || "#" + el.id, text: text, len: toks.length, tf: tf };
+  });
+  var avg = docs.reduce(function (a, d) { return a + d.len; }, 0) / docs.length;
+  var K1 = 1.5, B = 0.75;
+
+  function search(q) {
+    var qt = Array.from(new Set(terms(q)));
+    return docs.map(function (d) {
+      var score = qt.reduce(function (sum, t) {
+        var df = docs.filter(function (x) { return x.tf[t]; }).length, f = d.tf[t] || 0;
+        if (!f) return sum;
+        var idf = Math.log(1 + (docs.length - df + 0.5) / (df + 0.5));
+        return sum + idf * f * (K1 + 1) / (f + K1 * (1 - B + B * d.len / avg));
+      }, 0);
+      return { doc: d, score: score, qt: qt };
+    }).filter(function (r) { return r.score > 0; }).sort(function (a, b) { return b.score - a.score; }).slice(0, 3);
+  }
+
+  function bestPassage(text, qt) {
+    var parts = text.match(/[^.]+(\.\d+%?[^.]*)*\.?/g) || [text];
+    var best = parts[0], top = -1;
+    parts.forEach(function (p) {
+      var n = new Set(terms(p).filter(function (t) { return qt.indexOf(t) > -1; })).size;
+      if (n > top || (n === top && p.length > best.length)) { top = n; best = p; }
+    });
+    return best.trim();
+  }
+
+  function highlighted(p, text, qt) {
+    text.split(/([A-Za-z0-9_]+)/).forEach(function (bit) {
+      if (bit && qt.indexOf(stem(bit)) > -1) {
+        var m = document.createElement("mark"); m.textContent = bit; p.appendChild(m);
+      } else if (bit) { p.appendChild(document.createTextNode(bit)); }
+    });
+  }
+
+  var input = document.getElementById("q"), out = document.getElementById("results");
+  function run() {
+    var hits = search(input.value);
+    out.textContent = "";
+    if (!hits.length) {
+      var none = document.createElement("p");
+      none.textContent = input.value.trim() ? "No passage on this page matches that. Try RAG, churn, Flask or hackathons." : "Type a word such as RAG, churn or Flask.";
+      out.appendChild(none);
+      return;
+    }
+    var top = hits[0].score;
+    hits.forEach(function (h) {
+      var box = document.createElement("div"); box.className = "hit";
+      var head = document.createElement("div"); head.className = "hit-head";
+      var a = document.createElement("a"); a.href = h.doc.link; a.textContent = h.doc.title;
+      var s = document.createElement("span"); s.className = "hit-score"; s.textContent = "BM25 " + h.score.toFixed(2);
+      head.append(a, s);
+      var bar = document.createElement("div"); bar.className = "hit-bar";
+      var fill = document.createElement("i"); fill.style.width = (h.score / top * 100).toFixed(1) + "%"; bar.appendChild(fill);
+      var p = document.createElement("p"); highlighted(p, bestPassage(h.doc.text, h.qt), h.qt);
+      box.append(head, bar, p);
+      out.appendChild(box);
+    });
+  }
+  document.getElementById("search-form").addEventListener("submit", function (e) { e.preventDefault(); run(); });
+  input.addEventListener("input", run);
+  Array.prototype.forEach.call(document.querySelectorAll(".chips button"), function (b) {
+    b.addEventListener("click", function () { input.value = b.textContent; run(); });
+  });
+  run();
+
+  /* Fit the name to the page width, whichever font actually loaded. */
+  var h1 = document.querySelector("h1"), spans = h1.querySelectorAll("span");
+  function fitName() {
+    h1.style.fontSize = "";
+    var left = Infinity, right = 0;
+    Array.prototype.forEach.call(spans, function (n) {
+      var b = n.getBoundingClientRect();
+      left = Math.min(left, b.left); right = Math.max(right, b.right);
+    });
+    var cs = getComputedStyle(h1.parentElement);
+    var room = h1.parentElement.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    var size = parseFloat(getComputedStyle(h1).fontSize) * room / (right - left);
+    h1.style.fontSize = Math.min(Math.floor(size * 10) / 10, 320) + "px";
+  }
+  fitName();
+  addEventListener("resize", fitName);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitName);
+
+  var copy = document.getElementById("copy-email");
+  copy.addEventListener("click", function () {
+    var email = document.getElementById("email");
+    function selectIt() {
+      var r = document.createRange(); r.selectNodeContents(email);
+      var sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      copy.textContent = "Press copy to finish";
+    }
+    if (!navigator.clipboard) { selectIt(); return; }
+    navigator.clipboard.writeText(email.textContent).then(function () { copy.textContent = "Copied"; }, selectIt);
+  });
+})();
+</script>
+</body>
+</html>
